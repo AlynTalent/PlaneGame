@@ -34,8 +34,8 @@ public class MainActivity extends AppCompatActivity {
         Point size = new Point();
         Display display = getWindowManager().getDefaultDisplay();
         display.getSize(size);
-        xMax = (float) size.x - 100;
-        yMax = (float) size.y - 100;
+        xMax = (float) size.x - 200;
+        //yMax = (float) size.y - 200;
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
             public void onSensorChanged(SensorEvent sensorEvent) {
                 if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                     xAccel = sensorEvent.values[0];
-                    yAccel = -sensorEvent.values[1];
+                    //yAccel = -sensorEvent.values[1];
                     updatePlane();
                 }
             }
