@@ -18,8 +18,8 @@ import android.view.View;
 public class MainActivity extends AppCompatActivity {
     //Member variables
     private float xPos, xAccel, xVel = 0.0f;
-    private float yPos, yAccel, yVel = 0.0f;
-    private float xMax, yMax;
+    private float yPos = 800;
+    private float xMax;
     private Bitmap plane;
     private SensorManager sensorManager;
     SensorEventListener2 seListener;
@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
         Display display = getWindowManager().getDefaultDisplay();
         display.getSize(size);
         xMax = (float) size.x - 200;
-        //yMax = (float) size.y - 200;
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
@@ -47,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
             public void onSensorChanged(SensorEvent sensorEvent) {
                 if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                     xAccel = sensorEvent.values[0];
-                    //yAccel = -sensorEvent.values[1];
                     updatePlane();
                 }
             }
@@ -74,13 +72,10 @@ public class MainActivity extends AppCompatActivity {
     private void updatePlane() {
         float frameTime = 0.666f;
         xVel += (xAccel * frameTime);
-        yVel += (yAccel * frameTime);
 
         float xS = (xVel / 2) * frameTime;
-        float yS = (yVel / 2) * frameTime;
 
         xPos -= xS;
-        yPos -= yS;
 
         if(xPos > xMax){
             xPos = xMax;
@@ -88,11 +83,6 @@ public class MainActivity extends AppCompatActivity {
             xPos = 0;
         }
 
-        if(yPos > yMax){
-            yPos = yMax;
-        } else if(yPos < 0){
-            yPos = 0;
-        }
     }
 
     private class PlaneView extends View {
