@@ -7,15 +7,27 @@ import java.util.Random;
  */
 
 public class Cloud {
-    int x, y;
+    int x, y, type;
     int yspeed;
     Random xRand;
 
     Cloud(){
         xRand = new Random();
-        x = xRand.nextInt(800);
+        x = -100 + xRand.nextInt(900);
         y = -300;
-        yspeed = 3 + xRand.nextInt(5);
+        //yspeed = 5;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+        switch (type){
+            case 1:
+                yspeed = 5;
+                break;
+            case 2:
+                yspeed = 3;
+                break;
+        }
     }
 
     public int getX() {
@@ -31,8 +43,8 @@ public class Cloud {
 
         if(y >= 1550){
             y = -200;
-            x = 50 * xRand.nextInt(18);
-            yspeed = 3 + xRand.nextInt(5);
+            x = -100 + (50 * xRand.nextInt(20));
+            //yspeed = 3 + xRand.nextInt(5);
         }
     }
 

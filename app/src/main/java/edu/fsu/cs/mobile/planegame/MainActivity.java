@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
     public void tick(){
         Random temp = new Random();
 
-        if(temp.nextInt(100) <= 2){
+        if(temp.nextInt(250) <= 1){
             addClouds();
         }
         moveClouds();
@@ -125,7 +125,6 @@ public class MainActivity extends AppCompatActivity {
 
     public class PlaneView extends View {
         Paint emptyPaint;
-        ArrayList<Bitmap> clouds = new ArrayList<Bitmap>();
 
         public PlaneView(Context context){
             super(context);
@@ -133,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
             Bitmap planeSrc = BitmapFactory.decodeResource(getResources(), R.drawable.plane);
             final int dstWidth = 200;
             final int dstHeight = 200;
-            cloudSrc = BitmapFactory.decodeResource(getResources(), R.drawable.cloud);
+            cloudSrc = BitmapFactory.decodeResource(getResources(), R.drawable.white_cloud);
             cloud1 = Bitmap.createScaledBitmap(cloudSrc, 325, 200, false);
             cloud2 = Bitmap.createScaledBitmap(cloudSrc, 175, 100, false);
             plane = Bitmap.createScaledBitmap(planeSrc, dstWidth, dstHeight, true);
@@ -151,9 +150,11 @@ public class MainActivity extends AppCompatActivity {
             canvas.drawText("Score: ", 700, 200, paint);
 
             for(int i = 0; (i < cloudArray.size() && cloudArray.size() != 0); ++i){
-                if(i % 2 == 0) {
+                if(i > 4 ) {
+                    cloudArray.get(i).setType(1);
                     canvas.drawBitmap(cloud1, cloudArray.get(i).getX(), cloudArray.get(i).getY(), emptyPaint);
                 } else{
+                    cloudArray.get(i).setType(2);
                     canvas.drawBitmap(cloud2, cloudArray.get(i).getX(), cloudArray.get(i).getY(), emptyPaint);
                 }
             }
