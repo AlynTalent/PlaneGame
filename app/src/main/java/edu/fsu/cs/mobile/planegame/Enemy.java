@@ -3,35 +3,31 @@ package edu.fsu.cs.mobile.planegame;
 import java.util.Random;
 
 /**
- * Created by sam12 on 7/23/2017.
+ * Created by sam12 on 7/24/2017.
  */
 
-public class Cloud {
-    int x, y, type;
+public class Enemy {
+    int x, y;
     int yspeed;
     Random xRand;
 
-    Cloud(){
+    Enemy(){
         xRand = new Random();
         x = -100 + xRand.nextInt(900);
         y = -300;
-        //yspeed = 5;
-    }
-
-    public void setType(int type) {
-        this.type = type;
-        switch (type){
-            case 1:
-                yspeed = 5;
-                break;
-            case 2:
-                yspeed = 3;
-                break;
-        }
+        yspeed = 6;
     }
 
     public void speedUp(){
         yspeed = yspeed * 2;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setY(int y) {
+        this.y = y;
     }
 
     public int getX() {

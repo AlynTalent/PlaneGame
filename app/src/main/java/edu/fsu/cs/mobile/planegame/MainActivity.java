@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.hardware.Sensor;
@@ -14,7 +15,6 @@ import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
 
@@ -26,23 +26,23 @@ public class MainActivity extends AppCompatActivity {
     private float xPos, xAccel, xVel = 0.0f;
     private float yPos;
     private float xMax;
-    private Bitmap plane, cloud1, cloud2;
+    private Bitmap plane, cloud1, cloud2, enemy;
     private SensorManager sensorManager;
     SensorEventListener2 seListener;
     ArrayList<Cloud> cloudArray = new ArrayList<Cloud>();
-    int bkgdobj;
-    int height, width;
-    Bitmap cloudSrc;
+    ArrayList<Enemy> enemyArray = new ArrayList<Enemy>();
+    int bkgdobj, enemies, totalenemies=0;
+    Bitmap cloudSrc, enemySrc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        PlaneView planeView = new PlaneView(this);
+        final PlaneView planeView = new PlaneView(this);
         setContentView(planeView);
         bkgdobj = 10;
+        enemies = 10;
         Point size = new Point();
-        DisplayMetrics displayMetrics = new DisplayMetrics();
         Display display = getWindowManager().getDefaultDisplay();
         display.getSize(size);
 
@@ -100,11 +100,27 @@ public class MainActivity extends AppCompatActivity {
 
     public void tick(){
         Random temp = new Random();
-
         if(temp.nextInt(250) <= 1){
             addClouds();
         }
+
+        if(temp.nextInt(200) < 1){
+            if(totalenemies < 3){
+                addEnemies();
+            }
+        }
+
         moveClouds();
+        moveEnemies();
+    }
+
+    public void moveEnemies(){
+        Enemy tempEnemy = new Enemy();
+
+        for (int i = 0; i < enemyArray.size(); ++i){
+            tempEnemy = enemyArray.get(i);
+            tempEnemy.move();
+        }
     }
 
     public void moveClouds(){
@@ -123,6 +139,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void addEnemies(){
+        if(enemies != 0){
+            enemyArray.add(new Enemy());
+            --enemies;
+            ++totalenemies;
+        }
+    }
+
     public class PlaneView extends View {
         Paint emptyPaint;
 
@@ -133,9 +157,12 @@ public class MainActivity extends AppCompatActivity {
             final int dstWidth = 200;
             final int dstHeight = 200;
             cloudSrc = BitmapFactory.decodeResource(getResources(), R.drawable.white_cloud);
+            enemySrc = BitmapFactory.decodeResource(getResources(), R.drawable.enemy_fighter);
             cloud1 = Bitmap.createScaledBitmap(cloudSrc, 325, 200, false);
             cloud2 = Bitmap.createScaledBitmap(cloudSrc, 175, 100, false);
             plane = Bitmap.createScaledBitmap(planeSrc, dstWidth, dstHeight, true);
+            enemy = Bitmap.createScaledBitmap(enemySrc, 175, 200, false);
+            enemy = RotateBitmap(enemy, 180);
         }
 
         @Override
@@ -147,7 +174,6 @@ public class MainActivity extends AppCompatActivity {
 
             int Sky = Color.rgb(135, 206, 250);
             canvas.drawColor(Sky);
-            canvas.drawText("Score: ", 700, 200, paint);
 
             for(int i = 0; (i < cloudArray.size() && cloudArray.size() != 0); ++i){
                 if(i > 4 ) {
@@ -159,10 +185,30 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
+           for(int i = 0; (i < enemyArray.size() && enemyArray.size() != 0); ++i){
+               if(i > 0 && enemyArray.get(i).getX() == enemyArray.get(i-1).getX()){
+                   enemyArray.get(i).setX(enemyArray.get(i).getX() + 300);
+               }
+                canvas.drawBitmap(enemy, enemyArray.get(i).getX(), enemyArray.get(i).getY(), paint);
+            }
+
             canvas.drawBitmap(plane, xPos, yPos, null);
 
 
             invalidate();
+        }
+
+        public void speedUp(){
+            for(int i = 0; (i < cloudArray.size() && cloudArray.size() != 0); ++i){
+                cloudArray.get(i).speedUp();
+            }
+        }
+
+        public Bitmap RotateBitmap(Bitmap source, float angle)
+        {
+            Matrix matrix = new Matrix();
+            matrix.postRotate(angle);
+            return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
         }
     }
 }
