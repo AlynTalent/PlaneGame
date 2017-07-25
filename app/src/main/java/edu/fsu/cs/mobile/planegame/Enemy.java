@@ -13,7 +13,7 @@ public class Enemy {
 
     Enemy(){
         xRand = new Random();
-        x = -100 + xRand.nextInt(900);
+        x = 50 * xRand.nextInt(20);
         y = -300;
         yspeed = 6;
     }
@@ -43,8 +43,8 @@ public class Enemy {
 
         if(y >= 1550){
             y = -200;
-            x = -100 + (50 * xRand.nextInt(20));
-            //yspeed = 3 + xRand.nextInt(5);
+            x = 50 * xRand.nextInt(20);
+            MainActivity.updateScore();
         }
     }
 

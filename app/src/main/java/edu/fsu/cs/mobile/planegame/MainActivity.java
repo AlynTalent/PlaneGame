@@ -14,14 +14,15 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -29,7 +30,9 @@ import java.util.Random;
 public class MainActivity extends AppCompatActivity {
     //Member variables
     boolean startScreen = true;
-
+    static MenuItem score;
+    MenuItem lives;
+    Menu menu;
     private float xPos, xAccel, xVel = 0.0f;
     private float yPos;
     private float xMax;
@@ -38,7 +41,9 @@ public class MainActivity extends AppCompatActivity {
     SensorEventListener2 seListener;
     ArrayList<Cloud> cloudArray = new ArrayList<Cloud>();
     ArrayList<Enemy> enemyArray = new ArrayList<Enemy>();
-    int bkgdobj, enemies, totalenemies=0;
+    int clouds, enemies, totalenemies=0;
+    int livesRem = 3;
+    static int points = 0;
     Bitmap cloudSrc, enemySrc;
 
     @Override
@@ -47,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         final PlaneView planeView = new PlaneView(this);
         setContentView(planeView);
-        bkgdobj = 10;
+        clouds = 10;
         enemies = 10;
         Point size = new Point();
         Display display = getWindowManager().getDefaultDisplay();
@@ -105,6 +110,34 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
+    }
+
+    /* Called whenever we call invalidateOptionsMenu() */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        super.onCreateOptionsMenu(menu);
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+
+        score = menu.findItem(R.id.score);
+        score.setTitle("Score: " + points);
+
+        lives = menu.findItem(R.id.lives);
+        lives.setTitle("Lives: " + livesRem);
+
+        this.menu = menu;
+        return true;
+    }
+
+    public static void updateScore(){
+        points += 50;
+        score.setTitle("Score: " + points);
     }
 
     @Override
@@ -172,9 +205,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addClouds(){
-        if (bkgdobj != 0){
+        if (clouds != 0){
             cloudArray.add(new Cloud());
-            --bkgdobj;
+            --clouds;
         }
     }
 
@@ -226,9 +259,6 @@ public class MainActivity extends AppCompatActivity {
 
             if(startScreen == false) {
                 for (int i = 0; (i < enemyArray.size() && enemyArray.size() != 0); ++i) {
-                    if (i > 0 && enemyArray.get(i).getX() == enemyArray.get(i - 1).getX()) {
-                        enemyArray.get(i).setX(enemyArray.get(i).getX() + 300);
-                    }
                     canvas.drawBitmap(enemy, enemyArray.get(i).getX(), enemyArray.get(i).getY(), paint);
                 }
             }
