@@ -14,15 +14,22 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
     //Member variables
+    boolean startScreen = true;
+
     private float xPos, xAccel, xVel = 0.0f;
     private float yPos;
     private float xMax;
@@ -46,6 +53,36 @@ public class MainActivity extends AppCompatActivity {
         Display display = getWindowManager().getDefaultDisplay();
         display.getSize(size);
 
+        //setContentView(R.layout.activity_main);
+        setContentView(planeView);
+
+        //create start button dynamically
+        final Button startButton = new Button(this);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT);
+        params.topMargin = 0;
+        params.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+        startButton.setText("Start Game");
+        addContentView(startButton, params);
+
+        startButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startScreen = false;
+                startButton.setVisibility(View.GONE);
+                startButton.setClickable(false);
+            }
+        });
+
+       /* Button HighScoresButton = (Button) findViewById(R.id.HighScoreButton);
+        startButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //show fragemtn with high scores
+            }
+        });
+*/
         xMax = (float) size.x - 200;
         yPos = size.y - 450;
 
@@ -104,9 +141,11 @@ public class MainActivity extends AppCompatActivity {
             addClouds();
         }
 
-        if(temp.nextInt(200) < 1){
-            if(totalenemies < 3){
-                addEnemies();
+        if(startScreen == false) {
+            if (temp.nextInt(200) < 1) {
+                if (totalenemies < 3) {
+                    addEnemies();
+                }
             }
         }
 
@@ -185,13 +224,14 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-           for(int i = 0; (i < enemyArray.size() && enemyArray.size() != 0); ++i){
-               if(i > 0 && enemyArray.get(i).getX() == enemyArray.get(i-1).getX()){
-                   enemyArray.get(i).setX(enemyArray.get(i).getX() + 300);
-               }
-                canvas.drawBitmap(enemy, enemyArray.get(i).getX(), enemyArray.get(i).getY(), paint);
+            if(startScreen == false) {
+                for (int i = 0; (i < enemyArray.size() && enemyArray.size() != 0); ++i) {
+                    if (i > 0 && enemyArray.get(i).getX() == enemyArray.get(i - 1).getX()) {
+                        enemyArray.get(i).setX(enemyArray.get(i).getX() + 300);
+                    }
+                    canvas.drawBitmap(enemy, enemyArray.get(i).getX(), enemyArray.get(i).getY(), paint);
+                }
             }
-
             canvas.drawBitmap(plane, xPos, yPos, null);
 
 
