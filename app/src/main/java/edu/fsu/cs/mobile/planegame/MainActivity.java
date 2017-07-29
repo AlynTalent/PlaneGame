@@ -32,10 +32,10 @@ public class MainActivity extends AppCompatActivity {
     //Member variables
     boolean startScreen = true;
     static MenuItem score;
-    MenuItem lives;
+    static MenuItem lives;
     Menu menu;
-    private float xPos, xAccel, xVel = 0.0f;
-    private float yPos;
+    static float xPos, xAccel, xVel = 0.0f;
+    static float yPos;
     private float xMax;
     private Bitmap plane, cloud1, cloud2, enemy;
     private SensorManager sensorManager;
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Cloud> cloudArray = new ArrayList<Cloud>();
     ArrayList<Enemy> enemyArray = new ArrayList<Enemy>();
     int clouds, enemies, totalenemies = 0;
-    int livesRem = 3;
+    static int livesRem = 3;
     int move = 0;
     static int points = 0;
     Bitmap cloudSrc, enemySrc;
@@ -137,6 +137,11 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    public static void updateLives(){
+        livesRem--;
+        lives.setTitle("Lives: " + livesRem);
+
+    }
     public static void updateScore(){
         points += 50;
         score.setTitle("Score: " + points);
