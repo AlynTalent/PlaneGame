@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Typeface;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener2;
@@ -41,8 +42,9 @@ public class MainActivity extends AppCompatActivity {
     SensorEventListener2 seListener;
     ArrayList<Cloud> cloudArray = new ArrayList<Cloud>();
     ArrayList<Enemy> enemyArray = new ArrayList<Enemy>();
-    int clouds, enemies, totalenemies=0;
+    int clouds, enemies, totalenemies = 0;
     int livesRem = 3;
+    int move = 0;
     static int points = 0;
     Bitmap cloudSrc, enemySrc;
 
@@ -67,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
                 FrameLayout.LayoutParams.WRAP_CONTENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT);
         params.topMargin = 0;
-        params.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+        params.gravity = Gravity.CENTER | Gravity.CENTER_HORIZONTAL;
         startButton.setText("Start Game");
         addContentView(startButton, params);
 
@@ -101,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
             public void onSensorChanged(SensorEvent sensorEvent) {
                 if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                     xAccel = sensorEvent.values[0];
-                    updatePlane();
+                    //updatePlane();
                 }
             }
 
@@ -164,9 +166,31 @@ public class MainActivity extends AppCompatActivity {
 
     private void updatePlane() {
         float frameTime = 0.666f;
-        xVel += (xAccel * frameTime);
+        //xVel += (xAccel * frameTime);
+        float xS = 0;
+        //float xS = (xVel / 2) * frameTime;
 
-        float xS = (xVel / 2) * frameTime;
+        //xPos -= xS;
+        if(xAccel > -2 && xAccel < 2){
+            xVel = 0;
+            move = 0;
+        }else if(xAccel > 2){
+            if(move == 0 || move == -1){
+                xVel = 2;
+                move = 1;
+            }
+
+            xVel += xAccel * frameTime;
+            xS = (xVel / 2) * frameTime;
+        }else if(xAccel < -2){
+            if (move == 0 || move == 1){
+                xVel = -2;
+                move = -1;
+            }
+
+            xVel += xAccel * frameTime;
+            xS = (xVel / 2) * frameTime;
+        }
 
         xPos -= xS;
 
@@ -194,6 +218,7 @@ public class MainActivity extends AppCompatActivity {
 
         moveClouds();
         moveEnemies();
+        updatePlane();
     }
 
     public void moveEnemies(){
@@ -253,6 +278,7 @@ public class MainActivity extends AppCompatActivity {
             Paint paint = new Paint();
             paint.setTextSize(50);
             paint.setColor(Color.BLACK);
+            paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
 
             int Sky = Color.rgb(135, 206, 250);
             canvas.drawColor(Sky);
@@ -271,6 +297,8 @@ public class MainActivity extends AppCompatActivity {
                 for (int i = 0; (i < enemyArray.size() && enemyArray.size() != 0); ++i) {
                     canvas.drawBitmap(enemy, enemyArray.get(i).getX(), enemyArray.get(i).getY(), paint);
                 }
+            }else{
+                canvas.drawText("FIGHTING FALCON", 350, 300, paint);
             }
             canvas.drawBitmap(plane, xPos, yPos, null);
 
