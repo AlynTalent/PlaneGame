@@ -15,6 +15,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Display;
 import android.view.Gravity;
@@ -25,7 +26,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
     static float yPos;
     private float xMax;
     private static Bitmap plane;
+    private static Bitmap damagedPlane;
+    private static Bitmap explosion;
     private Bitmap cloud1;
     private Bitmap cloud2;
     private Bitmap enemy;
@@ -48,13 +50,15 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Cloud> cloudArray = new ArrayList<Cloud>();
     ArrayList<Enemy> enemyArray = new ArrayList<Enemy>();
     int clouds, enemies, totalenemies = 0;
-    static int livesRem = 3;
+    static int livesRem = 1;
     int move = 0;
     static int vulnerable = 0;
     static int points = 0;
     Bitmap cloudSrc;
     Bitmap enemySrc;
     static Bitmap planeSrc;
+    static Bitmap planeSrc2;
+    static Bitmap explosionSrc;
     static Context c;
     Button restartButton;
 
@@ -245,14 +249,9 @@ public class MainActivity extends AppCompatActivity {
         } else if(xPos < 0){
             xPos = 0;
         }
-/*
-        if(vulnerable == 20){
-            vulnerable = 0;
-        }
-*/
     }
 
-    public void tick(){
+    public void tick() {
         Random temp = new Random();
         if(temp.nextInt(250) <= 1){
             addClouds();
@@ -269,16 +268,23 @@ public class MainActivity extends AppCompatActivity {
         moveClouds();
         moveEnemies();
         updatePlane();
-
-        if(vulnerable == 1){
-            vulnerable = 0;
-        }
     }
 
     public static void doDamage(){
         if(vulnerable == 0){
             updateLives();
             vulnerable = 1;
+            //give 3 seconds before being vulnerable again
+            new CountDownTimer(3000,100){
+                @Override
+                public void onTick(long millisUntilFinished) {
+                }
+
+                @Override
+                public void onFinish() {
+                    vulnerable = 0;
+                }
+            }.start();
         }
     }
 
@@ -321,7 +327,10 @@ public class MainActivity extends AppCompatActivity {
         public PlaneView(Context context){
             super(context);
             emptyPaint = new Paint();
+
             planeSrc = BitmapFactory.decodeResource(getResources(), R.drawable.plane);
+            planeSrc2 = BitmapFactory.decodeResource(getResources(), R.drawable.damaged_plane);
+            //explosionSrc = BitmapFactory.decodeResource(getResources(), R.drawable.explosion);
             final int dstWidth = 200;
             final int dstHeight = 200;
             cloudSrc = BitmapFactory.decodeResource(getResources(), R.drawable.white_cloud);
@@ -329,6 +338,8 @@ public class MainActivity extends AppCompatActivity {
             cloud1 = Bitmap.createScaledBitmap(cloudSrc, 325, 200, false);
             cloud2 = Bitmap.createScaledBitmap(cloudSrc, 175, 100, false);
             plane = Bitmap.createScaledBitmap(planeSrc, dstWidth, dstHeight, true);
+            damagedPlane = Bitmap.createScaledBitmap(planeSrc2, dstWidth, dstHeight, true);
+            //explosion = Bitmap.createScaledBitmap(explosionSrc, dstWidth, dstHeight, true);
             enemy = Bitmap.createScaledBitmap(enemySrc, 175, 200, false);
             enemy = RotateBitmap(enemy, 180);
         }
@@ -367,16 +378,14 @@ public class MainActivity extends AppCompatActivity {
                 canvas.drawText("FIGHTING FALCON", 350, 350, paint);
             }
 
-            /*
-            if(vulnerable == 1) {
-                Toast t = Toast.makeText(getContext(), "-1 Life", Toast.LENGTH_SHORT);
-                t.setGravity(Gravity.CENTER, 0, 0);
-                t.show();
-                vulnerable = 0;
-            }
-            */
-            canvas.drawBitmap(plane, xPos, yPos, null);
 
+            //will only draw a plane when gameOver is not true
+            if (!gameOver) {
+                if (vulnerable == 1)
+                    canvas.drawBitmap(damagedPlane, xPos, yPos, null);
+                else
+                    canvas.drawBitmap(plane, xPos, yPos, null);
+            }
             invalidate();
         }
 
