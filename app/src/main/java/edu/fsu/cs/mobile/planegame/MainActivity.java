@@ -24,20 +24,25 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
     //Member variables
-    boolean startScreen = true;
+    static int startScreen = 0;
+    static boolean gameOver = false;
     static MenuItem score;
     static MenuItem lives;
     Menu menu;
     static float xPos, xAccel, xVel = 0.0f;
     static float yPos;
     private float xMax;
-    private Bitmap plane, cloud1, cloud2, enemy;
+    private static Bitmap plane;
+    private Bitmap cloud1;
+    private Bitmap cloud2;
+    private Bitmap enemy;
     private SensorManager sensorManager;
     SensorEventListener2 seListener;
     ArrayList<Cloud> cloudArray = new ArrayList<Cloud>();
@@ -45,8 +50,13 @@ public class MainActivity extends AppCompatActivity {
     int clouds, enemies, totalenemies = 0;
     static int livesRem = 3;
     int move = 0;
+    static int vulnerable = 0;
     static int points = 0;
-    Bitmap cloudSrc, enemySrc;
+    Bitmap cloudSrc;
+    Bitmap enemySrc;
+    static Bitmap planeSrc;
+    static Context c;
+    Button restartButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(planeView);
         clouds = 10;
         enemies = 10;
+        c = getApplicationContext();
         Point size = new Point();
         Display display = getWindowManager().getDefaultDisplay();
         display.getSize(size);
@@ -76,9 +87,32 @@ public class MainActivity extends AppCompatActivity {
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startScreen = false;
+                startScreen = 1;
                 startButton.setVisibility(View.GONE);
                 startButton.setClickable(false);
+            }
+        });
+
+        restartButton = new Button(c);
+        restartButton.setText("Restart Game");
+        addContentView(restartButton, params);
+        restartButton.setVisibility(View.GONE);
+        restartButton.setClickable(false);
+        enemyArray.clear();
+
+        restartButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startScreen = 1;
+                restartButton.setVisibility(View.GONE);
+                restartButton.setClickable(false);
+                gameOver = false;
+                enemies = 10;
+                totalenemies = 0;
+                livesRem = 3;
+                lives.setTitle("Lives: " + livesRem);
+                points = 0;
+                score.setTitle("Score: " + points);
             }
         });
 
@@ -138,9 +172,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void updateLives(){
-        livesRem--;
-        lives.setTitle("Lives: " + livesRem);
-
+        if(livesRem == 0){
+            gameOver = true;
+            startScreen = 0;
+        }else{
+            --livesRem;
+            lives.setTitle("Lives: " + livesRem);
+            Toast t = Toast.makeText(c, "-1 Life", Toast.LENGTH_SHORT);
+            t.setGravity(Gravity.CENTER, 0, 0);
+            t.show();
+        }
     }
     public static void updateScore(){
         points += 50;
@@ -204,7 +245,11 @@ public class MainActivity extends AppCompatActivity {
         } else if(xPos < 0){
             xPos = 0;
         }
-
+/*
+        if(vulnerable == 20){
+            vulnerable = 0;
+        }
+*/
     }
 
     public void tick(){
@@ -213,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
             addClouds();
         }
 
-        if(startScreen == false) {
+        if(startScreen == 1) {
             if (temp.nextInt(200) < 1) {
                 if (totalenemies < 3) {
                     addEnemies();
@@ -224,6 +269,17 @@ public class MainActivity extends AppCompatActivity {
         moveClouds();
         moveEnemies();
         updatePlane();
+
+        if(vulnerable == 1){
+            vulnerable = 0;
+        }
+    }
+
+    public static void doDamage(){
+        if(vulnerable == 0){
+            updateLives();
+            vulnerable = 1;
+        }
     }
 
     public void moveEnemies(){
@@ -265,7 +321,7 @@ public class MainActivity extends AppCompatActivity {
         public PlaneView(Context context){
             super(context);
             emptyPaint = new Paint();
-            Bitmap planeSrc = BitmapFactory.decodeResource(getResources(), R.drawable.plane);
+            planeSrc = BitmapFactory.decodeResource(getResources(), R.drawable.plane);
             final int dstWidth = 200;
             final int dstHeight = 200;
             cloudSrc = BitmapFactory.decodeResource(getResources(), R.drawable.white_cloud);
@@ -298,15 +354,28 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            if(startScreen == false) {
+            if(startScreen == 1) {
                 for (int i = 0; (i < enemyArray.size() && enemyArray.size() != 0); ++i) {
                     canvas.drawBitmap(enemy, enemyArray.get(i).getX(), enemyArray.get(i).getY(), paint);
                 }
+            }else if(gameOver == true){
+                canvas.drawText("Game Over", 350, 350, paint);
+                enemyArray.clear();
+                restartButton.setClickable(true);
+                restartButton.setVisibility(VISIBLE);
             }else{
-                canvas.drawText("FIGHTING FALCON", 350, 300, paint);
+                canvas.drawText("FIGHTING FALCON", 350, 350, paint);
             }
-            canvas.drawBitmap(plane, xPos, yPos, null);
 
+            /*
+            if(vulnerable == 1) {
+                Toast t = Toast.makeText(getContext(), "-1 Life", Toast.LENGTH_SHORT);
+                t.setGravity(Gravity.CENTER, 0, 0);
+                t.show();
+                vulnerable = 0;
+            }
+            */
+            canvas.drawBitmap(plane, xPos, yPos, null);
 
             invalidate();
         }

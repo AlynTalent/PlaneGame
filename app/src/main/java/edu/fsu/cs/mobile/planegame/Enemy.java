@@ -34,7 +34,7 @@ public class Enemy {
 
     public void detectCollision(){
         if(distance(x, y, (int) MainActivity.xPos, (int) MainActivity.yPos) < range){
-            MainActivity.updateLives();
+            MainActivity.doDamage();
         }
     }
 
