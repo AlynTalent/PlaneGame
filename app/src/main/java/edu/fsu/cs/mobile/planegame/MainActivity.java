@@ -50,8 +50,8 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Cloud> cloudArray = new ArrayList<Cloud>();
     ArrayList<Enemy> enemyArray = new ArrayList<Enemy>();
     int clouds, enemies, totalenemies = 0;
-    static int livesRem = 1;
-    int move = 0;
+    static int livesRem = 3;
+    int move = 0, maxEnemy, level;
     static int vulnerable = 0;
     static int points = 0;
     Bitmap cloudSrc;
@@ -70,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(planeView);
         clouds = 10;
         enemies = 10;
+        maxEnemy = 3;
+        level = 1;
         c = getApplicationContext();
         Point size = new Point();
         Display display = getWindowManager().getDefaultDisplay();
@@ -258,8 +260,19 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if(startScreen == 1) {
+            switch (level){
+                default:
+                    if(points / 1000 == level){
+                        maxEnemy++;
+                        level++;
+                        Toast t = Toast.makeText(c, "Level " + level, Toast.LENGTH_SHORT);
+                        t.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                        t.show();
+                    }
+            }
+
             if (temp.nextInt(200) < 1) {
-                if (totalenemies < 3) {
+                if (totalenemies < maxEnemy) {
                     addEnemies();
                 }
             }
