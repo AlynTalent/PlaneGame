@@ -22,6 +22,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -61,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     static Bitmap explosionSrc;
     static Context c;
     Button restartButton;
+    boolean pause = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +98,17 @@ public class MainActivity extends AppCompatActivity {
                 startScreen = 1;
                 startButton.setVisibility(View.GONE);
                 startButton.setClickable(false);
+            }
+        });
+
+        planeView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (pause == false)
+                    pause = true;
+                else
+                    pause = false;
+                return MainActivity.super.onTouchEvent(event);
             }
         });
 
@@ -278,9 +291,11 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        moveClouds();
-        moveEnemies();
-        updatePlane();
+        if(pause == false) {
+            moveClouds();
+            moveEnemies();
+            updatePlane();
+        }
     }
 
     public static void doDamage(){
@@ -337,6 +352,7 @@ public class MainActivity extends AppCompatActivity {
     public class PlaneView extends View {
         Paint emptyPaint;
 
+
         public PlaneView(Context context){
             super(context);
             emptyPaint = new Paint();
@@ -390,6 +406,9 @@ public class MainActivity extends AppCompatActivity {
             }else{
                 canvas.drawText("FIGHTING FALCON", 350, 350, paint);
             }
+
+            if(pause == true)
+                canvas.drawText("PAUSE", 350, 350, paint);
 
 
             //will only draw a plane when gameOver is not true
