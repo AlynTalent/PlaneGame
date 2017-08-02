@@ -158,21 +158,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-       /* Button HighScoresButton = (Button) findViewById(R.id.HighScoreButton);
-        startButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //show fragemtn with high scores
-            }
-        });
-*/
-
         scoresButton = new Button(this);
         FrameLayout.LayoutParams scoreParams = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.WRAP_CONTENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT);
-        scoreParams.topMargin = 0;
-        scoreParams.gravity = Gravity.CENTER + 50 | Gravity.CENTER_HORIZONTAL;
+        scoreParams.topMargin = 850;
+        scoreParams.leftMargin = 375;
         scoresButton.setText("High Scores");
         addContentView(scoresButton, scoreParams);
 
