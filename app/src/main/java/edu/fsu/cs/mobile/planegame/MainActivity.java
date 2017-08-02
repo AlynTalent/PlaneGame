@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Cloud> cloudArray = new ArrayList<Cloud>();
     ArrayList<Enemy> enemyArray = new ArrayList<Enemy>();
     int clouds, enemies, totalenemies = 0;
-    static int livesRem = 0;
+    static int livesRem = 3;
     int move = 0, maxEnemy, level;
     static int vulnerable = 0;
     static int points = 0;
