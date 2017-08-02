@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Cloud> cloudArray = new ArrayList<Cloud>();
     ArrayList<Enemy> enemyArray = new ArrayList<Enemy>();
     int clouds, enemies, totalenemies = 0;
-    static int livesRem = 3;
+    static int livesRem = 0;
     int move = 0, maxEnemy, level;
     static int vulnerable = 0;
     static int points = 0;
@@ -231,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showHighScores(){
-        Cursor mCursor = getContentResolver().query(mProvider.CONTENT_URI, null, null, null, null);
+        Cursor mCursor = getContentResolver().query(mProvider.CONTENT_URI, null, null, null, mProvider.SCORE_POINTS + " DESC");
         SimpleCursorAdapter mAdapter;
         String[] mListColumns;
 
@@ -410,19 +410,21 @@ public class MainActivity extends AppCompatActivity {
         alert.setTitle("Add High Score");
         alert.setMessage("Enter Your Name");
         final EditText input = new EditText(this);
+        final int success = 0;
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
         input.setLayoutParams(lp);
+
         alert.setView(input);
         alert.setPositiveButton("Submit",
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mNewValues.put(mProvider.SCORE_POINTS, points);
-                        mNewValues.put(mProvider.SCORE_NAME, input.getText().toString());
-
-                        getContentResolver().insert(mProvider.CONTENT_URI, mNewValues);
+                                mNewValues.put(mProvider.SCORE_POINTS, points);
+                                mNewValues.put(mProvider.SCORE_NAME, input.getText().toString());
+                                getContentResolver().insert(mProvider.CONTENT_URI, mNewValues);
+                                showHighScores();
                     }
                 });
 
