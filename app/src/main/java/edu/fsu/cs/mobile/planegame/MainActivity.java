@@ -78,6 +78,10 @@ public class MainActivity extends AppCompatActivity {
         Point size = new Point();
         Display display = getWindowManager().getDefaultDisplay();
         display.getSize(size);
+        int width = size.x;
+        int height = size.y;
+        System.out.println(width);
+        System.out.println(height);
 
         //setContentView(R.layout.activity_main);
         setContentView(planeView);
@@ -101,13 +105,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         planeView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (pause == false)
-                    pause = true;
-                else
-                    pause = false;
+                if (startScreen !=0) {
+                    if (pause == false)
+                        pause = true;
+                    else
+                        pause = false;
+                }
                 return MainActivity.super.onTouchEvent(event);
             }
         });
@@ -291,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        if(pause == false) {
+        if(pause == false || startScreen==0) {
             moveClouds();
             moveEnemies();
             updatePlane();
@@ -352,7 +359,6 @@ public class MainActivity extends AppCompatActivity {
     public class PlaneView extends View {
         Paint emptyPaint;
 
-
         public PlaneView(Context context){
             super(context);
             emptyPaint = new Paint();
@@ -407,7 +413,7 @@ public class MainActivity extends AppCompatActivity {
                 canvas.drawText("FIGHTING FALCON", 350, 350, paint);
             }
 
-            if(pause == true)
+            if(pause == true && startScreen == 1)
                 canvas.drawText("PAUSE", 350, 350, paint);
 
 
