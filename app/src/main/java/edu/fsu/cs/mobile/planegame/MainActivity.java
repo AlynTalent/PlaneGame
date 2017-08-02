@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private float xMax;
     private static Bitmap plane;
     private static Bitmap damagedPlane;
-    private static Bitmap explosion;
+    private static Bitmap title, gameover_title, pause_title;
     private Bitmap cloud1;
     private Bitmap cloud2;
     private Bitmap enemy;
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         final PlaneView planeView = new PlaneView(this);
         setContentView(planeView);
         clouds = 10;
-        enemies = 10;
+        enemies = 20;
         maxEnemy = 3;
         level = 1;
         mProvider = new ScoreProvider();
@@ -436,6 +436,9 @@ public class MainActivity extends AppCompatActivity {
             planeSrc = BitmapFactory.decodeResource(getResources(), R.drawable.plane);
             planeSrc2 = BitmapFactory.decodeResource(getResources(), R.drawable.damaged_plane);
             //explosionSrc = BitmapFactory.decodeResource(getResources(), R.drawable.explosion);
+            title = BitmapFactory.decodeResource(getResources(), R.drawable.ff_title_edit);
+            gameover_title = BitmapFactory.decodeResource(getResources(), R.drawable.ff_gameover_edit);
+            pause_title = BitmapFactory.decodeResource(getResources(), R.drawable.ff_paused_edit);
             final int dstWidth = 200;
             final int dstHeight = 200;
             cloudSrc = BitmapFactory.decodeResource(getResources(), R.drawable.white_cloud);
@@ -450,7 +453,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onDraw(Canvas canvas){
+        protected void onDraw(Canvas canvas) {
             tick();
             Paint paint = new Paint();
             paint.setTextSize(50);
@@ -460,38 +463,41 @@ public class MainActivity extends AppCompatActivity {
             int Sky = Color.rgb(135, 206, 250);
             canvas.drawColor(Sky);
 
-            for(int i = 0; (i < cloudArray.size() && cloudArray.size() != 0); ++i){
-                if(i > 4 ) {
+            for (int i = 0; (i < cloudArray.size() && cloudArray.size() != 0); ++i) {
+                if (i > 4) {
                     cloudArray.get(i).setType(1);
                     canvas.drawBitmap(cloud1, cloudArray.get(i).getX(), cloudArray.get(i).getY(), emptyPaint);
-                } else{
+                } else {
                     cloudArray.get(i).setType(2);
                     canvas.drawBitmap(cloud2, cloudArray.get(i).getX(), cloudArray.get(i).getY(), emptyPaint);
                 }
             }
 
-            if(startScreen == 1) {
+            if (startScreen == 1) {
                 for (int i = 0; (i < enemyArray.size() && enemyArray.size() != 0); ++i) {
                     canvas.drawBitmap(enemy, enemyArray.get(i).getX(), enemyArray.get(i).getY(), paint);
                 }
-            }else if(gameOver == true){
-                canvas.drawText("Game Over", 350, 350, paint);
+            } else if (gameOver == true) {
+                //canvas.drawText("Game Over", 350, 350, paint);
+                canvas.drawBitmap(gameover_title, 275, 150, paint);
                 enemyArray.clear();
                 restartButton.setClickable(true);
                 restartButton.setVisibility(VISIBLE);
                 scoresButton.setClickable(true);
                 scoresButton.setVisibility(VISIBLE);
-                if(scoreAdded == 0) {
+                if (scoreAdded == 0) {
                     addHighScore();
                     scoreAdded++;
                 }
-            }else{
-                canvas.drawText("FIGHTING FALCON", 350, 350, paint);
+            } else {
+                //canvas.drawText("FIGHTING FALCON", 350, 350, paint);
+                canvas.drawBitmap(title, 175, 150, paint);
             }
 
-            if(pause == true && startScreen == 1)
-                canvas.drawText("PAUSE", 350, 350, paint);
-
+            if (pause == true && startScreen == 1){
+            //canvas.drawText("PAUSE", 350, 350, paint);
+                canvas.drawBitmap(pause_title, 225, 150, paint);
+        }
 
             //will only draw a plane when gameOver is not true
             if (!gameOver) {
