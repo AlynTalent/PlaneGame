@@ -43,34 +43,43 @@ public class MainActivity extends AppCompatActivity {
     //Member variables
     static int startScreen = 0;
     static boolean gameOver = false;
+    static int vulnerable = 0;
+    static Context c;
+    Button restartButton, scoresButton;
+
+    // Menu Items for score and lives
     static MenuItem score;
     static MenuItem lives;
     Menu menu;
+    static int livesRem = 3;
+    static int points = 0;
+
+    // Position variables for player
     static float xPos, xAccel, xVel = 0.0f;
     static float yPos;
     private float xMax;
+
+    // Bitmaps
     private static Bitmap plane;
     private static Bitmap damagedPlane;
     private static Bitmap title, gameover_title, pause_title;
     private Bitmap cloud1;
     private Bitmap cloud2;
     private Bitmap enemy;
-    private SensorManager sensorManager;
-    SensorEventListener2 seListener;
-    ArrayList<Cloud> cloudArray = new ArrayList<Cloud>();
-    ArrayList<Enemy> enemyArray = new ArrayList<Enemy>();
-    int clouds, enemies, totalenemies = 0;
-    static int livesRem = 3;
-    int move = 0, maxEnemy, level;
-    static int vulnerable = 0;
-    static int points = 0;
     Bitmap cloudSrc;
     Bitmap enemySrc;
     static Bitmap planeSrc;
     static Bitmap planeSrc2;
-    static Bitmap explosionSrc;
-    static Context c;
-    Button restartButton, scoresButton;
+
+    // Sensor Manager
+    private SensorManager sensorManager;
+    SensorEventListener2 seListener;
+
+    // Arrays and Variables for Enemies and Clouds
+    ArrayList<Cloud> cloudArray = new ArrayList<Cloud>();
+    ArrayList<Enemy> enemyArray = new ArrayList<Enemy>();
+    int clouds, enemies, totalenemies = 0;
+    int move = 0, maxEnemy, level;
 
     //Content Provider
     ScoreProvider mProvider;
@@ -97,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         //setContentView(R.layout.activity_main);
         setContentView(planeView);
 
-        //create start button dynamically
+        // Start Button
         final Button startButton = new Button(this);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.WRAP_CONTENT,
@@ -119,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+        // On Touch Listener for Pause
         planeView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -132,6 +142,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        // Restart Button
         restartButton = new Button(c);
         restartButton.setText("Restart Game");
         addContentView(restartButton, params);
@@ -158,6 +170,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // High Scores Button
         scoresButton = new Button(this);
         FrameLayout.LayoutParams scoreParams = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.WRAP_CONTENT,
@@ -177,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
         xMax = (float) size.x - 200;
         yPos = size.y - 450;
 
+
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
         seListener = new SensorEventListener2() {
@@ -187,7 +201,6 @@ public class MainActivity extends AppCompatActivity {
             public void onSensorChanged(SensorEvent sensorEvent) {
                 if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                     xAccel = sensorEvent.values[0];
-                    //updatePlane();
                 }
             }
 
