@@ -1,7 +1,10 @@
 package edu.fsu.cs.mobile.planegame;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -16,6 +19,8 @@ import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Display;
 import android.view.Gravity;
@@ -24,9 +29,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -61,7 +70,11 @@ public class MainActivity extends AppCompatActivity {
     static Bitmap planeSrc2;
     static Bitmap explosionSrc;
     static Context c;
-    Button restartButton;
+    Button restartButton, scoresButton;
+
+    //Content Provider
+    ScoreProvider mProvider;
+    int scoreAdded;
     boolean pause = false;
 
     @Override
@@ -74,14 +87,12 @@ public class MainActivity extends AppCompatActivity {
         enemies = 10;
         maxEnemy = 3;
         level = 1;
+        mProvider = new ScoreProvider();
+        scoreAdded = 0;
         c = getApplicationContext();
         Point size = new Point();
         Display display = getWindowManager().getDefaultDisplay();
         display.getSize(size);
-        int width = size.x;
-        int height = size.y;
-        System.out.println(width);
-        System.out.println(height);
 
         //setContentView(R.layout.activity_main);
         setContentView(planeView);
@@ -102,6 +113,8 @@ public class MainActivity extends AppCompatActivity {
                 startScreen = 1;
                 startButton.setVisibility(View.GONE);
                 startButton.setClickable(false);
+                scoresButton.setClickable(false);
+                scoresButton.setVisibility(View.GONE);
             }
         });
 
@@ -132,6 +145,8 @@ public class MainActivity extends AppCompatActivity {
                 startScreen = 1;
                 restartButton.setVisibility(View.GONE);
                 restartButton.setClickable(false);
+                scoresButton.setVisibility(View.GONE);
+                scoresButton.setClickable(false);
                 gameOver = false;
                 enemies = 10;
                 totalenemies = 0;
@@ -139,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
                 lives.setTitle("Lives: " + livesRem);
                 points = 0;
                 score.setTitle("Score: " + points);
+                scoreAdded = 0;
             }
         });
 
@@ -150,6 +166,23 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 */
+
+        scoresButton = new Button(this);
+        FrameLayout.LayoutParams scoreParams = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT);
+        scoreParams.topMargin = 0;
+        scoreParams.gravity = Gravity.CENTER + 50 | Gravity.CENTER_HORIZONTAL;
+        scoresButton.setText("High Scores");
+        addContentView(scoresButton, scoreParams);
+
+        scoresButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showHighScores();
+            }
+        });
+
         xMax = (float) size.x - 200;
         yPos = size.y - 450;
 
@@ -195,6 +228,21 @@ public class MainActivity extends AppCompatActivity {
 
         this.menu = menu;
         return true;
+    }
+
+    public void showHighScores(){
+        Cursor mCursor = getContentResolver().query(mProvider.CONTENT_URI, null, null, null, null);
+        SimpleCursorAdapter mAdapter;
+        String[] mListColumns;
+
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("High Scores");
+
+        mListColumns = new String[]{mProvider.SCORE_NAME, mProvider.SCORE_POINTS};
+        mAdapter = new SimpleCursorAdapter(c, R.layout.list_score, mCursor, mListColumns, new int[]{R.id.name, R.id.points}, 1 );
+        alert.setAdapter(mAdapter, null);
+        alert.setCancelable(true);
+        alert.show();
     }
 
     public static void updateLives(){
@@ -286,7 +334,7 @@ public class MainActivity extends AppCompatActivity {
                         maxEnemy++;
                         level++;
                         Toast t = Toast.makeText(c, "Level " + level, Toast.LENGTH_SHORT);
-                        t.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                        t.setGravity(Gravity.CENTER, 0, 0);
                         t.show();
                     }
             }
@@ -356,6 +404,34 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void addHighScore(){
+        final ContentValues mNewValues = new ContentValues();
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Add High Score");
+        alert.setMessage("Enter Your Name");
+        final EditText input = new EditText(this);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+        input.setLayoutParams(lp);
+        alert.setView(input);
+        alert.setPositiveButton("Submit",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mNewValues.put(mProvider.SCORE_POINTS, points);
+                        mNewValues.put(mProvider.SCORE_NAME, input.getText().toString());
+
+                        getContentResolver().insert(mProvider.CONTENT_URI, mNewValues);
+                    }
+                });
+
+        alert.setCancelable(false);
+        alert.show();
+
+
+    }
+
     public class PlaneView extends View {
         Paint emptyPaint;
 
@@ -409,6 +485,12 @@ public class MainActivity extends AppCompatActivity {
                 enemyArray.clear();
                 restartButton.setClickable(true);
                 restartButton.setVisibility(VISIBLE);
+                scoresButton.setClickable(true);
+                scoresButton.setVisibility(VISIBLE);
+                if(scoreAdded == 0) {
+                    addHighScore();
+                    scoreAdded++;
+                }
             }else{
                 canvas.drawText("FIGHTING FALCON", 350, 350, paint);
             }

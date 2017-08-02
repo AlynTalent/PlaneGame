@@ -27,6 +27,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <provider
+            android:authorities="edu.fsu.cs.mobile.planegame.ScoreProvider"
+            android:name=".ScoreProvider"
+            android:enabled="true"
+            android:exported="true" />
     </application>
 
 </manifest>

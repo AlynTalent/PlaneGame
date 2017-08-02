@@ -10,7 +10,7 @@ public class Enemy {
     int x, y;
     int yspeed;
     Random xRand;
-    int range = 100;
+    int range = 115;
 
     Enemy(){
         xRand = new Random();
