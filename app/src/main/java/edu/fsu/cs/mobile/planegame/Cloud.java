@@ -15,7 +15,6 @@ public class Cloud {
         xRand = new Random();
         x = -100 + xRand.nextInt(900);
         y = -300;
-        //yspeed = 5;
     }
 
     public void setType(int type) {
@@ -48,7 +47,6 @@ public class Cloud {
         if(y >= 1550){
             y = -200;
             x = -100 + (50 * xRand.nextInt(20));
-            //yspeed = 3 + xRand.nextInt(5);
         }
     }
 

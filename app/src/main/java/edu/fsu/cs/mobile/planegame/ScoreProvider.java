@@ -56,10 +56,6 @@ public class ScoreProvider extends ContentProvider{
 
     public Uri insert(Uri uri, ContentValues values){
 
-        //String _id = values.getAsString(RUN_ID);
-        //String steps = values.getAsString(RUN_STEPS);
-        //String distance = values.getAsString(RUN_DISTANCE);
-
         Log.i("Insert", "About to insert");
 
 
@@ -88,7 +84,6 @@ public class ScoreProvider extends ContentProvider{
         }
         @Override
         public void onCreate(SQLiteDatabase db) {
-            //db.execSQL("DROP TABLE IF EXISTS " + RUN_TABLE);
             db.execSQL(SQL_CREATE);
         }
 

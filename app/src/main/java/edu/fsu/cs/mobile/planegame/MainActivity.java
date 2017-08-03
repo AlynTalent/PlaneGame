@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
         xMax = (float) size.x - 200;
         yPos = size.y - 450;
 
-
+        // Accelerometer Sensor
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
         seListener = new SensorEventListener2() {
@@ -211,12 +211,13 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
-    /* Called whenever we call invalidateOptionsMenu() */
+    // Called whenever we call invalidateOptionsMenu()
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         return super.onPrepareOptionsMenu(menu);
     }
 
+    // Creating the Menu Bar
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         super.onCreateOptionsMenu(menu);
@@ -234,6 +235,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    // Function to Show High Scores from Content Provider
     public void showHighScores(){
         Cursor mCursor = getContentResolver().query(mProvider.CONTENT_URI, null, null, null, mProvider.SCORE_POINTS + " DESC");
         SimpleCursorAdapter mAdapter;
@@ -249,6 +251,7 @@ public class MainActivity extends AppCompatActivity {
         alert.show();
     }
 
+    // Decrement Lives
     public static void updateLives(){
         if(livesRem == 0){
             gameOver = true;
@@ -261,6 +264,8 @@ public class MainActivity extends AppCompatActivity {
             t.show();
         }
     }
+
+    // Increment Score
     public static void updateScore(){
         points += 50;
         score.setTitle("Score: " + points);
@@ -288,13 +293,11 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
     }
 
+    // Move Player
     private void updatePlane() {
         float frameTime = 0.666f;
-        //xVel += (xAccel * frameTime);
         float xS = 0;
-        //float xS = (xVel / 2) * frameTime;
 
-        //xPos -= xS;
         if(xAccel > -2 && xAccel < 2){
             xVel = 0;
             move = 0;
@@ -325,6 +328,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Tick calling the move functions for player, enemies and clouds.
+    // also handles level up
     public void tick() {
         Random temp = new Random();
         if(temp.nextInt(250) <= 1){
@@ -357,6 +362,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Do damage to the player and make player invulnerable
+    // for 3 seconds
     public static void doDamage(){
         if(vulnerable == 0){
             updateLives();
@@ -375,6 +382,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Move the Enemies on screen
     public void moveEnemies(){
         Enemy tempEnemy = new Enemy();
 
@@ -384,6 +392,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Move the clouds
     public void moveClouds(){
         Cloud tempCloud = new Cloud();
 
@@ -393,6 +402,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // add Clouds to screen
     public void addClouds(){
         if (clouds != 0){
             cloudArray.add(new Cloud());
@@ -400,6 +410,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // ass Enemies to screen
     public void addEnemies(){
         if(enemies != 0){
             enemyArray.add(new Enemy());
@@ -408,6 +419,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // add High Score to Content Provider
+    // Creates a alert with an Edit Text so the
+    // player can enter their names for the high score list.
     public void addHighScore(){
         final ContentValues mNewValues = new ContentValues();
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -433,35 +447,36 @@ public class MainActivity extends AppCompatActivity {
                 });
 
         alert.setCancelable(false);
-
         alert.show();
-
-
     }
 
+    // View for the Game
     public class PlaneView extends View {
         Paint emptyPaint;
 
         public PlaneView(Context context){
             super(context);
             emptyPaint = new Paint();
+            final int dstWidth = 200;
+            final int dstHeight = 200;
 
+            // Decode Resources
             planeSrc = BitmapFactory.decodeResource(getResources(), R.drawable.plane);
             planeSrc2 = BitmapFactory.decodeResource(getResources(), R.drawable.damaged_plane);
-            //explosionSrc = BitmapFactory.decodeResource(getResources(), R.drawable.explosion);
             title = BitmapFactory.decodeResource(getResources(), R.drawable.ff_title_edit);
             gameover_title = BitmapFactory.decodeResource(getResources(), R.drawable.ff_gameover_edit);
             pause_title = BitmapFactory.decodeResource(getResources(), R.drawable.ff_paused_edit);
-            final int dstWidth = 200;
-            final int dstHeight = 200;
             cloudSrc = BitmapFactory.decodeResource(getResources(), R.drawable.white_cloud);
             enemySrc = BitmapFactory.decodeResource(getResources(), R.drawable.enemy_fighter);
+
+            // Scale Bitmaps
             cloud1 = Bitmap.createScaledBitmap(cloudSrc, 325, 200, false);
             cloud2 = Bitmap.createScaledBitmap(cloudSrc, 175, 100, false);
             plane = Bitmap.createScaledBitmap(planeSrc, dstWidth, dstHeight, true);
             damagedPlane = Bitmap.createScaledBitmap(planeSrc2, dstWidth, dstHeight, true);
-            //explosion = Bitmap.createScaledBitmap(explosionSrc, dstWidth, dstHeight, true);
             enemy = Bitmap.createScaledBitmap(enemySrc, 175, 200, false);
+
+            // Rotate Enemy to point down on screen
             enemy = RotateBitmap(enemy, 180);
         }
 
@@ -476,6 +491,7 @@ public class MainActivity extends AppCompatActivity {
             int Sky = Color.rgb(135, 206, 250);
             canvas.drawColor(Sky);
 
+            // Draw Clouds
             for (int i = 0; (i < cloudArray.size() && cloudArray.size() != 0); ++i) {
                 if (i > 4) {
                     cloudArray.get(i).setType(1);
@@ -487,11 +503,12 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (startScreen == 1) {
+                // Draw Enemies
                 for (int i = 0; (i < enemyArray.size() && enemyArray.size() != 0); ++i) {
                     canvas.drawBitmap(enemy, enemyArray.get(i).getX(), enemyArray.get(i).getY(), paint);
                 }
             } else if (gameOver == true) {
-                //canvas.drawText("Game Over", 350, 350, paint);
+                // Game Over Screen
                 canvas.drawBitmap(gameover_title, 275, 150, paint);
                 enemyArray.clear();
                 restartButton.setClickable(true);
@@ -503,12 +520,12 @@ public class MainActivity extends AppCompatActivity {
                     scoreAdded++;
                 }
             } else {
-                //canvas.drawText("FIGHTING FALCON", 350, 350, paint);
+                // Draw Title for Start Screen
                 canvas.drawBitmap(title, 175, 150, paint);
             }
 
             if (pause == true && startScreen == 1){
-            //canvas.drawText("PAUSE", 350, 350, paint);
+                // Draw Pause Screen
                 canvas.drawBitmap(pause_title, 225, 150, paint);
         }
 
@@ -522,12 +539,14 @@ public class MainActivity extends AppCompatActivity {
             invalidate();
         }
 
+        // Speed Up function (Unused)
         public void speedUp(){
             for(int i = 0; (i < cloudArray.size() && cloudArray.size() != 0); ++i){
                 cloudArray.get(i).speedUp();
             }
         }
 
+        // Function to rotate the Enemy Bitmap
         public Bitmap RotateBitmap(Bitmap source, float angle)
         {
             Matrix matrix = new Matrix();
